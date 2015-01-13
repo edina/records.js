@@ -6,7 +6,7 @@
           return (root.myModule = factory());
         });
     }else if(typeof module === "object" && module.exports){
-        module.exports = (root.recordsjs = factory());
+        module.exports = (root.RecordsJS = factory());
     }else{
         root.pcapi = factory();
     }
@@ -14,5 +14,27 @@
 "use strict";
 
 
+var RecordsJS = function (){
+
+};
+
+RecordsJS.prototype.put = function(){
+
+};
+
+RecordsJS.prototype.putAll = function(){
+
+};
+
+RecordsJS.prototype.get = function(){
+
+};
+
+RecordsJS.prototype.getAll = function(){
+
+};
+
+
+return new RecordsJS();
 
 }));
