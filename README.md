@@ -1,0 +1,1 @@
+A schema aware javascript datastore
