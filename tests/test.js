@@ -7,15 +7,22 @@ describe('Records.JS', function(){
     var testData = {'itchy': 'scratchy'};
 
     describe('put', function(){
-        it('save an empty record', function(){
+        it('save a record', function(){
             assert.equal(true, records.put('testData', testData));
         });
     });
 
     describe('get', function(){
-        it('retrieve a record by id', function(){
+        it('retrieve a record', function(){
             assert.deepEqual(testData, records.get('testData'));
         });
+
+        it('retrieve a record and metadata', function(){
+            var annotation = {};
+            annotation.record = testData;
+            assert.deepEqual(annotation, records.get('testData', {metadata: true}));
+        });
+
     });
 
 });
