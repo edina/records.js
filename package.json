@@ -2,9 +2,14 @@
     "name": "records.js",
     "version": "0.0.1",
     "private": true,
+    "scripts": {
+        "test": "mocha tests/test.js"
+    },
     "dependencies": {
+        "extend": "~2.0.0"
     },
     "devDependencies": {
-        "mocha": "~2.1.0"
+        "mocha": "~2.1.0",
+        "node-localstorage" : "0.3.6"
     }
 }
