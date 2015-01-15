@@ -63,23 +63,19 @@ RecordsJS.prototype.deserialize = function(id){
     }
 };
 
-RecordsJS.prototype.clear = function(){
-    for(var key in this.index){
-        if(this.index.hasOwnProperty(key)){
-            this.deleteKeyFromIndex(key);
-        }
-    }
+RecordsJS.prototype.deleteFromStorage = function(id){
+    localStorage.removeItem(id);
 };
 
 RecordsJS.prototype.buildInternalId = function(id){
     return this.dataStore + id;
 };
 
-RecordsJS.prototype.addKeyToIndex = function(key, internalKey){
+RecordsJS.prototype.addToIndex = function(key, internalKey){
     this.index[key] = internalKey;
 };
 
-RecordsJS.prototype.deleteKeyFromIndex = function(key){
+RecordsJS.prototype.deleteFromIndex = function(key){
     delete this.index[key];
 };
 
@@ -94,7 +90,7 @@ RecordsJS.prototype.buildIndex = function(){
 
         matches = key.match(regex);
         if(matches !== null){
-            this.addKeyToIndex(matches[1], key);
+            this.addToIndex(matches[1], key);
         }
     }
 };
@@ -173,6 +169,19 @@ RecordsJS.prototype.getAll = function(options){
     return items;
 };
 
+RecordsJS.prototype.delete = function(id){
+    var internalId;
+
+    internalId = this.buildInternalId(id);
+    this.deleteFromStorage(internalId);
+    this.deleteFromIndex(id);
+};
+
+RecordsJS.prototype.deleteAll = function(){
+    for(var key in this.index){
+        this.delete(key);
+    }
+};
 
 return RecordsJS;
 

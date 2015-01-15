@@ -18,6 +18,7 @@ describe('Records.JS', function(){
         return {_id: a.key, record: a.value};
     };
 
+    records.deleteAll();
 
     describe('put', function(){
         it('save a record', function(){
@@ -52,6 +53,22 @@ describe('Records.JS', function(){
         it('retrieve all records with metadata', function(){
             var _testData = testData.map(toMetaData);
             assert.deepEqual(_testData, records.getAll({metadata: true}));
+        });
+    });
+
+    describe('delete', function(){
+        it('delete a record', function(){
+            var recordKey = testData[0].key;
+            records.delete(recordKey);
+            assert.equal(null, records.get(recordKey));
+
+        });
+
+        it('all the records', function(){
+            records.deleteAll();
+            records.buildIndex();
+            assert.deepEqual([], records.getAll());
+
         });
     });
 
