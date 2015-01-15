@@ -29,14 +29,7 @@ var RecordsJS = function (name, options){
     this.options = extend(defaults, options);
     this.name = name;
     this.dataStore = this.options.dataPrefix + this.name + this.options.nameSeparator;
-
-
-    data = this.deserialize(this.dataStore);
-    if(data === null){
-        this.serialize(this.dataStore, {
-            name: name
-        });
-    }
+    this.buildIndex();
 };
 
 RecordsJS.prototype.serialize = function(id, data){
@@ -74,8 +67,25 @@ RecordsJS.prototype.buildInternalId = function(id){
     return this.dataStore + id;
 };
 
+RecordsJS.prototype.buildIndex = function(){
+    var regex, key, matches;
+
+    regex = new RegExp('^' + this.dataStore + '(.+)$');
+
+    this.index = {};
+    for(var i=0, len=localStorage.length; i<len; i++){
+        key = localStorage.key(i);
+
+        matches = key.match(regex);
+        if(matches !== null){
+            this.index[matches[1]] = key;
+        }
+    }
+};
+
+
 RecordsJS.prototype.put = function(id, object, options){
-    var annotation, internalId;
+    var annotation, internalId, result;
 
     options = extend({}, options);
     internalId = this.buildInternalId(id);
@@ -89,7 +99,13 @@ RecordsJS.prototype.put = function(id, object, options){
         annotation._id = id;
     }
 
-    return this.serialize(internalId, annotation);
+    result = this.serialize(internalId, annotation);
+
+    if(result === true){
+        this.index[id] = internalId;
+    }
+
+    return result;
 };
 
 RecordsJS.prototype.putAll = function(objects, options){
@@ -120,19 +136,14 @@ RecordsJS.prototype.get = function(id, options){
 };
 
 RecordsJS.prototype.getAll = function(options){
-    var key, items, annotation, regex, matches, item;
+    var items, annotation, regex, matches, item;
 
     options = extend({}, options);
-    //TODO: Precompile all regex in the constructor
-    regex = new RegExp('^' + this.dataStore + '(.+)$');
-    // TODO: Replace this linear search with an index
-    items = [];
-    for(var i=0, len=localStorage.length; i<len; i++){
-        key = localStorage.key(i);
 
-        matches = key.match(regex);
-        if(matches !== null){
-            annotation = this.deserialize(key);
+    items = [];
+    for(var key in this.index){
+        if(this.index.hasOwnProperty(key)){
+            annotation = this.deserialize(this.index[key]);
             if(options.metadata === true){
                 item = annotation;
             }else{
