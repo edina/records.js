@@ -63,8 +63,24 @@ RecordsJS.prototype.deserialize = function(id){
     }
 };
 
+RecordsJS.prototype.clear = function(){
+    for(var key in this.index){
+        if(this.index.hasOwnProperty(key)){
+            this.deleteKeyFromIndex(key);
+        }
+    }
+};
+
 RecordsJS.prototype.buildInternalId = function(id){
     return this.dataStore + id;
+};
+
+RecordsJS.prototype.addKeyToIndex = function(key, internalKey){
+    this.index[key] = internalKey;
+};
+
+RecordsJS.prototype.deleteKeyFromIndex = function(key){
+    delete this.index[key];
 };
 
 RecordsJS.prototype.buildIndex = function(){
@@ -78,7 +94,7 @@ RecordsJS.prototype.buildIndex = function(){
 
         matches = key.match(regex);
         if(matches !== null){
-            this.index[matches[1]] = key;
+            this.addKeyToIndex(matches[1], key);
         }
     }
 };
