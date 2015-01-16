@@ -8,14 +8,14 @@
     }else if(typeof module === 'object' && module.exports){
         module.exports = (root.RecordsJS = factory(require('extend')));
     }else{
-        root.pcapi = factory(root.extend);
+        root.RecordsJS = factory(root.extend);
     }
 }(this, function(extend){
 "use strict";
 
 if (typeof localStorage === 'undefined' || localStorage === null) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  var localStorage = new LocalStorage('./localstorage.db');
+    var LocalStorage = require('node-localstorage').LocalStorage;
+    var localStorage = new LocalStorage('./localstorage.db');
 }
 
 var defaults = {
@@ -29,8 +29,19 @@ var RecordsJS = function (name, options){
     this.options = extend(defaults, options);
     this.name = name;
     this.dataStore = this.options.dataPrefix + this.name + this.options.nameSeparator;
+
+    data = this.deserialize(this.dataStore);
+    if(data === null){
+        this.serialize(this.dataStore, {
+            validation: {},
+            schemas: {}
+        });
+    }
+
     this.buildIndex();
 };
+
+/* Adapter methods for localstorage */
 
 RecordsJS.prototype.serialize = function(id, data){
     var dataStr;
@@ -67,6 +78,8 @@ RecordsJS.prototype.deleteFromStorage = function(id){
     localStorage.removeItem(id);
 };
 
+/* Index methods */
+
 RecordsJS.prototype.buildInternalId = function(id){
     return this.dataStore + id;
 };
@@ -95,6 +108,50 @@ RecordsJS.prototype.buildIndex = function(){
     }
 };
 
+/* Schema functions */
+
+RecordsJS.prototype.addSchema = function(name, schema){
+    var internals;
+
+    internals = this.deserialize(this.dataStore);
+    internals.schema[name] = schema;
+    this.serialize(this.dataStore, internals);
+};
+
+RecordsJS.prototype.deleteSchema = function(name){
+    var internals;
+
+    internals = this.deserialize(this.dataStore);
+    delete internals.schema[name];
+    this.serialize(this.dataStore, internals);
+};
+
+RecordsJS.prototype.getSchema = function(name){
+    var internals;
+
+    internals = this.deserialize(this.dataStore);
+    return internals.schema[name];
+};
+
+RecordsJS.prototype.testSchema = function(name, object){
+    return false;
+};
+
+/* Record validation against schema */
+
+RecordsJS.prototype.addRecordValidation = function(prefix, schemaName){
+
+};
+
+RecordsJS.prototype.deleteRecordValidation = function(prefix, schemaName){
+
+};
+
+RecordsJS.prototype.getRecordValidation = function(prefix){
+
+};
+
+/* API methods */
 
 RecordsJS.prototype.put = function(id, object, options){
     var annotation, internalId, result;
@@ -114,7 +171,7 @@ RecordsJS.prototype.put = function(id, object, options){
     result = this.serialize(internalId, annotation);
 
     if(result === true){
-        this.index[id] = internalId;
+        this.addToIndex(id, internalId);
     }
 
     return result;

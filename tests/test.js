@@ -72,5 +72,29 @@ describe('Records.JS', function(){
         });
     });
 
+    describe('schema', function(){
+        it('add a schema', function(){
+            records.addSchema('geoJSON', geoJSON);
+        });
+
+        it('get schema', function(){
+            assert.deepEqual(records.getSchema('geoJSON'), geoJSON);
+        });
+
+        it('test negative against schema', function(){
+            assert.equal(false, records.testSchema('geoJSON', {}));
+        });
+
+        it('test positive against schema', function(){
+            assert.equal(true, records.testSchema('geoJSON', geoJSON));
+        });
+
+        it('delete schema', function(){
+            records.deleteSchema('geoJSON');
+            assert.equal(undefined, records.getSchema('geoJSON'));
+        });
+    });
+
+
 
 });
