@@ -2,15 +2,18 @@
     "use strict";
 
     if(typeof define === 'function' && define.amd){
-        define(['extend'], function(extend){
-          return (root.RecordsJS = factory(extend));
+        define(['assign', 'tv4'], function(assign, tv4){
+          return (root.RecordsJS = factory(assign, tv4));
         });
     }else if(typeof module === 'object' && module.exports){
-        module.exports = (root.RecordsJS = factory(require('extend')));
+        var assign = Object.assign || require('object.assign');
+        var tv4 = require('tv4');
+
+        module.exports = (root.RecordsJS = factory(assign, tv4));
     }else{
-        root.RecordsJS = factory(root.extend);
+        root.RecordsJS = factory(Object.assign, root.tv4);
     }
-}(this, function(extend){
+}(this, function(assign, tv4){
 "use strict";
 
 if (typeof localStorage === 'undefined' || localStorage === null) {
@@ -26,7 +29,7 @@ var defaults = {
 var RecordsJS = function (name, options){
     var data;
 
-    this.options = extend(defaults, options);
+    this.options = assign(defaults, options);
     this.name = name;
     this.dataStore = this.options.dataPrefix + this.name + this.options.nameSeparator;
 
@@ -110,31 +113,42 @@ RecordsJS.prototype.buildIndex = function(){
 
 /* Schema functions */
 
-RecordsJS.prototype.addSchema = function(name, schema){
+RecordsJS.prototype.addSchema = function(schema){
     var internals;
 
     internals = this.deserialize(this.dataStore);
-    internals.schema[name] = schema;
+    internals.schemas[schema.id] = schema;
     this.serialize(this.dataStore, internals);
+
+    // Add to the cache
+    tv4.addSchema(assign({}, schema));
 };
 
 RecordsJS.prototype.deleteSchema = function(name){
     var internals;
 
     internals = this.deserialize(this.dataStore);
-    delete internals.schema[name];
+    delete internals.schemas[name];
     this.serialize(this.dataStore, internals);
+    // tv4.dropSchema(uri, schema);
 };
 
-RecordsJS.prototype.getSchema = function(name){
+RecordsJS.prototype.getSchema = function(uri){
     var internals;
 
     internals = this.deserialize(this.dataStore);
-    return internals.schema[name];
+
+    return internals.schemas[uri];
 };
 
-RecordsJS.prototype.testSchema = function(name, object){
-    return false;
+RecordsJS.prototype.validateSchema = function(uri, object){
+    var schema;
+    var valid;
+
+    schema = tv4.getSchema(uri);
+    valid = tv4.validate(object, schema);
+
+    return valid;
 };
 
 /* Record validation against schema */
@@ -156,7 +170,7 @@ RecordsJS.prototype.getRecordValidation = function(prefix){
 RecordsJS.prototype.put = function(id, object, options){
     var annotation, internalId, result;
 
-    options = extend({}, options);
+    options = assign({}, options);
     internalId = this.buildInternalId(id);
 
     if(options.metadata !== true){
@@ -192,7 +206,7 @@ RecordsJS.prototype.putAll = function(objects, options){
 RecordsJS.prototype.get = function(id, options){
     var annotation, internalId;
 
-    options = extend({}, options);
+    options = assign({}, options);
     internalId = this.buildInternalId(id);
 
     annotation = this.deserialize(internalId);
@@ -207,7 +221,7 @@ RecordsJS.prototype.get = function(id, options){
 RecordsJS.prototype.getAll = function(options){
     var items, annotation, regex, matches, item;
 
-    options = extend({}, options);
+    options = assign({}, options);
 
     items = [];
     for(var key in this.index){

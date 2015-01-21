@@ -1,5 +1,6 @@
 var RecordsJS = require('../src/index.js');
 var assert = require('assert');
+var fs = require('fs');
 
 
 describe('Records.JS', function(){
@@ -73,25 +74,49 @@ describe('Records.JS', function(){
     });
 
     describe('schema', function(){
+        var geoJSONSchema = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geojson.json'));
+        var geoJSONSchema2 = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geojson.json'));
+        var geoJSONBBox = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/bbox.json'));
+        var geoJSONCRS = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/crs.json'));
+        var geoJSONGeometry = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geometry.json'));
+
+        var geoJSONRecord = {
+            "type": "Feature",
+            "geometry": {
+            "type": "Point",
+                "coordinates": [125.6, 10.1]
+            },
+            "properties": {
+                "name": "Dinagat Islands"
+            }
+        };
+
+
         it('add a schema', function(){
-            records.addSchema('geoJSON', geoJSON);
+            records.addSchema(geoJSONSchema);
+            records.addSchema(geoJSONBBox);
+            records.addSchema(geoJSONCRS);
+            records.addSchema(geoJSONGeometry);
         });
 
         it('get schema', function(){
-            assert.deepEqual(records.getSchema('geoJSON'), geoJSON);
+            var schema = records.getSchema(geoJSONSchema.id);
+            assert.deepEqual(schema, geoJSONSchema2);
         });
 
         it('test negative against schema', function(){
-            assert.equal(false, records.testSchema('geoJSON', {}));
+            assert.equal(false, records.validateSchema(geoJSONSchema.id, {}));
         });
 
         it('test positive against schema', function(){
-            assert.equal(true, records.testSchema('geoJSON', geoJSON));
+            var valid;
+            valid = records.validateSchema(geoJSONSchema.id, geoJSONRecord);
+            assert.equal(true, valid);
         });
 
         it('delete schema', function(){
-            records.deleteSchema('geoJSON');
-            assert.equal(undefined, records.getSchema('geoJSON'));
+            records.deleteSchema(geoJSONSchema.id);
+            assert.equal(undefined, records.getSchema(geoJSONSchema.id));
         });
     });
 
