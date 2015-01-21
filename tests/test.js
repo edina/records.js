@@ -91,6 +91,15 @@ describe('Records.JS', function(){
             }
         };
 
+        var NonTypeGeoJSONRecord = {
+            "geometry": {
+            "type": "Point",
+                "coordinates": [125.6, 10.1]
+            },
+            "properties": {
+                "name": "Dinagat Islands"
+            }
+        };
 
         it('add a schema', function(){
             records.addSchema(geoJSONSchema);
@@ -105,7 +114,7 @@ describe('Records.JS', function(){
         });
 
         it('test negative against schema', function(){
-            assert.equal(false, records.validateSchema(geoJSONSchema.id, {}));
+            assert.equal(false, records.validateSchema(geoJSONSchema.id, NonTypeGeoJSONRecord));
         });
 
         it('test positive against schema', function(){
