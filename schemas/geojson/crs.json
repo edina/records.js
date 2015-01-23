@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://json-schema.org/geojson/crs.json#",
     "title": "crs",
     "description": "a Coordinate Reference System object",
     "type": [ "object", "null" ],

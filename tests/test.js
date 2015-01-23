@@ -75,7 +75,6 @@ describe('Records.JS', function(){
 
     describe('schema', function(){
         var geoJSONSchema = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geojson.json'));
-        var geoJSONSchema2 = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geojson.json'));
         var geoJSONBBox = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/bbox.json'));
         var geoJSONCRS = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/crs.json'));
         var geoJSONGeometry = JSON.parse(fs.readFileSync(__dirname + '/../schemas/geojson/geometry.json'));
@@ -110,7 +109,7 @@ describe('Records.JS', function(){
 
         it('get schema', function(){
             var schema = records.getSchema(geoJSONSchema.id);
-            assert.deepEqual(schema, geoJSONSchema2);
+            assert.deepEqual(schema, geoJSONSchema);
         });
 
         it('test negative against schema', function(){

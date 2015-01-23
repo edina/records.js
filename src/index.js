@@ -2,18 +2,18 @@
     "use strict";
 
     if(typeof define === 'function' && define.amd){
-        define(['assign', 'tv4'], function(assign, tv4){
-          return (root.RecordsJS = factory(assign, tv4));
+        define(['assign', 'jsonschema'], function(assign, jsonschema){
+          return (root.RecordsJS = factory(assign, jsonschema.Validator));
         });
     }else if(typeof module === 'object' && module.exports){
         var assign = Object.assign || require('object.assign');
-        var tv4 = require('tv4');
+        var Validator = require('jsonschema').Validator;
 
-        module.exports = (root.RecordsJS = factory(assign, tv4));
+        module.exports = (root.RecordsJS = factory(assign, Validator));
     }else{
-        root.RecordsJS = factory(Object.assign, root.tv4);
+        root.RecordsJS = factory(Object.assign, root.Validator);
     }
-}(this, function(assign, tv4){
+}(this, function(assign, Validator){
 "use strict";
 
 if (typeof localStorage === 'undefined' || localStorage === null) {
@@ -41,6 +41,7 @@ var RecordsJS = function (name, options){
         });
     }
 
+    this.v = new Validator();
     this.buildIndex();
 };
 
@@ -121,7 +122,8 @@ RecordsJS.prototype.addSchema = function(schema){
     this.serialize(this.dataStore, internals);
 
     // Add to the cache
-    tv4.addSchema(assign({}, schema));
+    this.v.addSchema(schema);
+    //tv4.addSchema(assign({}, schema));
 };
 
 RecordsJS.prototype.deleteSchema = function(name){
@@ -145,24 +147,9 @@ RecordsJS.prototype.validateSchema = function(uri, object){
     var schema;
     var valid;
 
-    schema = tv4.getSchema(uri);
-    valid = tv4.validate(object, schema);
+    valid = this.v.validate(object, this.getSchema(uri));
 
-    return valid;
-};
-
-/* Record validation against schema */
-
-RecordsJS.prototype.addRecordValidation = function(prefix, schemaName){
-
-};
-
-RecordsJS.prototype.deleteRecordValidation = function(prefix, schemaName){
-
-};
-
-RecordsJS.prototype.getRecordValidation = function(prefix){
-
+    return valid.errors.length === 0;
 };
 
 /* API methods */
@@ -192,7 +179,6 @@ RecordsJS.prototype.put = function(id, object, options){
 };
 
 RecordsJS.prototype.putAll = function(objects, options){
-    //options = extend({}, options);
     var result, results;
 
     results = [];
