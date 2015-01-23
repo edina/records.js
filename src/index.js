@@ -41,7 +41,7 @@ var RecordsJS = function (name, options){
         });
     }
 
-    this.v = new Validator();
+    this.loadSchemas();
     this.buildIndex();
 };
 
@@ -112,42 +112,101 @@ RecordsJS.prototype.buildIndex = function(){
     }
 };
 
+RecordsJS.prototype._addSchema = function(uri, schema){
+    this.schemas[uri] = new Validator();
+    this.schemas[uri].addSchema(schema);
+};
+
+RecordsJS.prototype._addSchemaDependency = function(uri, dependency){
+    this.schemas[uri].addSchema(dependency);
+};
+
+RecordsJS.prototype.loadSchemas = function(){
+    var dependency;
+    var internals;
+    var schemas;
+    var schema;
+
+    this.schemas = {};
+
+    internals = this.deserialize(this.dataStore);
+    schemas = internals.schemas;
+
+    if(schemas !== null){
+        for(var uri in schemas){
+            if(schemas.hasOwnProperty(key)){
+                schema = schemas[uri];
+                this._addSchema(uri, schema.schema);
+
+                for(var key in schema.dependencies){
+                    dependency = schema.dependencies[key];
+                    this._addSchemaDependency(uri, dependency);
+                }
+            }
+        }
+    }
+};
+
 /* Schema functions */
 
-RecordsJS.prototype.addSchema = function(schema){
+RecordsJS.prototype.createSchema = function(schema){
+    var internals;
+    var schemaObj = {
+        schema: schema,
+        dependencies: []
+    };
+
+    // Save the schema
+    internals = this.deserialize(this.dataStore);
+    internals.schemas[schema.id] = schemaObj;
+    this.serialize(this.dataStore, internals);
+
+    // Add to the cache
+    this._addSchema(schema.id, schema);
+};
+
+RecordsJS.prototype.addSchemaDependency = function(uri, schema){
     var internals;
 
     internals = this.deserialize(this.dataStore);
     internals.schemas[schema.id] = schema;
     this.serialize(this.dataStore, internals);
 
-    // Add to the cache
-    this.v.addSchema(schema);
-    //tv4.addSchema(assign({}, schema));
+    this._addSchemaDependency(uri, schema);
 };
 
-RecordsJS.prototype.deleteSchema = function(name){
+RecordsJS.prototype.deleteSchema = function(uri){
     var internals;
 
     internals = this.deserialize(this.dataStore);
-    delete internals.schemas[name];
+    delete internals.schemas[uri];
     this.serialize(this.dataStore, internals);
-    // tv4.dropSchema(uri, schema);
+
+    delete this.schemas[uri];
 };
 
 RecordsJS.prototype.getSchema = function(uri){
     var internals;
+    var internalSchema;
+    var schema;
 
     internals = this.deserialize(this.dataStore);
 
-    return internals.schemas[uri];
+    internalSchema = internals.schemas[uri];
+    if(internalSchema !== undefined){
+        schema = internalSchema.schema;
+    }
+
+    return schema;
 };
 
 RecordsJS.prototype.validateSchema = function(uri, object){
     var schema;
     var valid;
 
-    valid = this.v.validate(object, this.getSchema(uri));
+    schema = this.schemas[uri];
+
+    valid = schema.validate(object, schema.getSchema(uri));
 
     return valid.errors.length === 0;
 };

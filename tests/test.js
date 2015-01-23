@@ -100,11 +100,14 @@ describe('Records.JS', function(){
             }
         };
 
-        it('add a schema', function(){
-            records.addSchema(geoJSONSchema);
-            records.addSchema(geoJSONBBox);
-            records.addSchema(geoJSONCRS);
-            records.addSchema(geoJSONGeometry);
+        it('create a schema', function(){
+            records.createSchema(geoJSONSchema);
+        });
+
+        it('add schema dependencies', function(){
+            records.addSchemaDependency(geoJSONSchema.id, geoJSONBBox);
+            records.addSchemaDependency(geoJSONSchema.id, geoJSONCRS);
+            records.addSchemaDependency(geoJSONSchema.id, geoJSONGeometry);
         });
 
         it('get schema', function(){
