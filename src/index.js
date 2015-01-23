@@ -3,23 +3,26 @@
 
     if(typeof define === 'function' && define.amd){
         define(['assign', 'jsonschema'], function(assign, jsonschema){
-          return (root.RecordsJS = factory(assign, jsonschema.Validator));
+          return (root.RecordsJS = factory(assign, jsonschema.Validator, localStorage));
         });
     }else if(typeof module === 'object' && module.exports){
         var assign = Object.assign || require('object.assign');
         var Validator = require('jsonschema').Validator;
+        var storage;
 
-        module.exports = (root.RecordsJS = factory(assign, Validator));
+        if (typeof localStorage === 'undefined' || localStorage === null) {
+            var LocalStorage = require('node-localstorage').LocalStorage;
+            storage = new LocalStorage('./localstorage.db');
+        }else{
+            storage = localStorage;
+        }
+
+        module.exports = (root.RecordsJS = factory(assign, Validator, storage));
     }else{
-        root.RecordsJS = factory(Object.assign, root.Validator);
+        root.RecordsJS = factory(Object.assign, root.Validator, localStorage);
     }
-}(this, function(assign, Validator){
+}(this, function(assign, Validator, localStorage){
 "use strict";
-
-if (typeof localStorage === 'undefined' || localStorage === null) {
-    var LocalStorage = require('node-localstorage').LocalStorage;
-    var localStorage = new LocalStorage('./localstorage.db');
-}
 
 var defaults = {
     dataPrefix: 'recordsjs@',
