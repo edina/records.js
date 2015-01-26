@@ -341,7 +341,7 @@ RecordsJS.prototype.putAll = function(objects, options){
 };
 
 /**
- * Get an stored object
+ * Get a stored object
  * @param id the id of the object
  * @param options.metadata true/false if the object should be returned in its metadata
  * @returns an object or null if doesn't exist
