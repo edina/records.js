@@ -29,6 +29,11 @@ var defaults = {
     nameSeparator: '#'
 };
 
+/**
+ * Initialize a new storage or load an existing one
+ * @param name the name of the storage
+ * @param options optional parameter overriding the defaults
+ */
 var RecordsJS = function (name, options){
     var data;
 
@@ -50,6 +55,12 @@ var RecordsJS = function (name, options){
 
 /* Adapter methods for localstorage */
 
+/**
+ * Serialize an object into the storage
+ * @param id of the object
+ * @param data the object to store
+ * @returns boolean if the operation succeded
+ */
 RecordsJS.prototype.serialize = function(id, data){
     var dataStr;
 
@@ -63,6 +74,11 @@ RecordsJS.prototype.serialize = function(id, data){
     }
 };
 
+/**
+ * Deserialize an object into the storage
+ * @param id of the object
+ * @returns the object stored or null id is not found
+ */
 RecordsJS.prototype.deserialize = function(id){
     var data, dataStr;
 
@@ -81,24 +97,46 @@ RecordsJS.prototype.deserialize = function(id){
     }
 };
 
+/**
+ * Delete an item from the storage
+ * @param id of the object
+ */
 RecordsJS.prototype.deleteFromStorage = function(id){
     localStorage.removeItem(id);
 };
 
 /* Index methods */
 
+
+/**
+ * Builds tne internal id for given id
+ * @param id
+ * @returns the internal id
+ */
 RecordsJS.prototype.buildInternalId = function(id){
     return this.dataStore + id;
 };
 
+/**
+ * Maps keys with internal keys in the index
+ * @param key
+ * @param internalKey
+ */
 RecordsJS.prototype.addToIndex = function(key, internalKey){
     this.index[key] = internalKey;
 };
 
+/**
+ * Maps keys with internal keys in the index
+ * @param key
+ */
 RecordsJS.prototype.deleteFromIndex = function(key){
     delete this.index[key];
 };
 
+/**
+ * Builds an index searching all the objects in the datastore namespace
+ */
 RecordsJS.prototype.buildIndex = function(){
     var regex, key, matches;
 
@@ -115,15 +153,30 @@ RecordsJS.prototype.buildIndex = function(){
     }
 };
 
+/* Schema functions */
+
+/**
+ * Add schema
+ * @param uri
+ * @param schema
+ */
 RecordsJS.prototype._addSchema = function(uri, schema){
     this.schemas[uri] = new Validator();
     this.schemas[uri].addSchema(schema);
 };
 
+/**
+ * Add schema dependency
+ * @param uri
+ * @param dependency
+ */
 RecordsJS.prototype._addSchemaDependency = function(uri, dependency){
     this.schemas[uri].addSchema(dependency);
 };
 
+/**
+ * Load the existing schemas in the datastore into the validator
+ */
 RecordsJS.prototype.loadSchemas = function(){
     var dependency;
     var internals;
@@ -150,8 +203,11 @@ RecordsJS.prototype.loadSchemas = function(){
     }
 };
 
-/* Schema functions */
 
+/**
+ * Creates a new schema
+ * @param schema a json schema identified for schema.id
+ */
 RecordsJS.prototype.createSchema = function(schema){
     var internals;
     var schemaObj = {
@@ -168,6 +224,11 @@ RecordsJS.prototype.createSchema = function(schema){
     this._addSchema(schema.id, schema);
 };
 
+/**
+ * Add a schema dependency to an existing schema
+ * @param uri the id of the existing schema
+ * @param schema a json schema identified for schema.id
+ */
 RecordsJS.prototype.addSchemaDependency = function(uri, schema){
     var internals;
 
@@ -178,6 +239,10 @@ RecordsJS.prototype.addSchemaDependency = function(uri, schema){
     this._addSchemaDependency(uri, schema);
 };
 
+/**
+ * Delete a schema and its dependencies
+ * @param uri the schema id
+ */
 RecordsJS.prototype.deleteSchema = function(uri){
     var internals;
 
@@ -188,6 +253,11 @@ RecordsJS.prototype.deleteSchema = function(uri){
     delete this.schemas[uri];
 };
 
+/**
+ * Get a schema
+ * @param uri the id of the schema
+ * @returns the schema or undefined if not found
+ */
 RecordsJS.prototype.getSchema = function(uri){
     var internals;
     var internalSchema;
@@ -203,6 +273,12 @@ RecordsJS.prototype.getSchema = function(uri){
     return schema;
 };
 
+/**
+ * Validate an object against and stored schema
+ * @param uri the if of the schema
+ * @param object an object to validate
+ * @returns true/false if the object is valid
+ */
 RecordsJS.prototype.validateSchema = function(uri, object){
     var schema;
     var valid;
@@ -216,6 +292,13 @@ RecordsJS.prototype.validateSchema = function(uri, object){
 
 /* API methods */
 
+/**
+ * Put an object into the storage
+ * @param id for storing the object
+ * @param object to store
+ * @param options.metadata true/false if the object is wrapped in its metadata
+ * @returns a boolean with the result of the operation
+ */
 RecordsJS.prototype.put = function(id, object, options){
     var annotation, internalId, result;
 
@@ -240,6 +323,12 @@ RecordsJS.prototype.put = function(id, object, options){
     return result;
 };
 
+/**
+ * Put an array of objects into the storage
+ * @param objects and array of objects in the form of {key: 'objectId', value: object}
+ * @param options.metadata true/false if the object is wrapped in its metadata
+ * @returns an array of booleans if the operation was completed
+ */
 RecordsJS.prototype.putAll = function(objects, options){
     var result, results;
 
@@ -251,6 +340,12 @@ RecordsJS.prototype.putAll = function(objects, options){
     return results;
 };
 
+/**
+ * Get an stored object
+ * @param id the id of the object
+ * @param options.metadata true/false if the object should be returned in its metadata
+ * @returns an object or null if doesn't exist
+ */
 RecordsJS.prototype.get = function(id, options){
     var annotation, internalId;
 
@@ -266,6 +361,11 @@ RecordsJS.prototype.get = function(id, options){
     }
 };
 
+/**
+ * Get all the objects stored
+ * @param options.metadata true/false if the object should be returned in its metadata
+ * @returns an array of objects
+ */
 RecordsJS.prototype.getAll = function(options){
     var items, annotation, regex, matches, item;
 
@@ -288,6 +388,10 @@ RecordsJS.prototype.getAll = function(options){
     return items;
 };
 
+/**
+ * Delete a stored object
+ * @param id of the object
+ */
 RecordsJS.prototype.delete = function(id){
     var internalId;
 
@@ -296,6 +400,9 @@ RecordsJS.prototype.delete = function(id){
     this.deleteFromIndex(id);
 };
 
+/**
+ * Delete all stored object
+ */
 RecordsJS.prototype.deleteAll = function(){
     for(var key in this.index){
         this.delete(key);
