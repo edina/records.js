@@ -5,7 +5,8 @@
         define(['assign', 'jsonschema'], function(assign, jsonschema) {
             return (root.RecordsJS = factory(assign, jsonschema.Validator, localStorage));
         });
-    }else if (typeof module === 'object' && module.exports) {
+    }
+    else if (typeof module === 'object' && module.exports) {
         var assign = Object.assign || require('object.assign');
         var Validator = require('jsonschema').Validator;
         var storage;
@@ -18,7 +19,8 @@
         }
 
         module.exports = (root.RecordsJS = factory(assign, Validator, storage));
-    }else {
+    }
+    else {
         root.RecordsJS = factory(Object.assign, root.Validator, localStorage);
     }
 }(this, function(assign, Validator, localStorage) { // jscs:disable validateIndentation
@@ -93,7 +95,8 @@ RecordsJS.prototype.deserialize = function(id) {
             console.error(ex);
             return null;
         }
-    }else {
+    }
+    else {
         return null;
     }
 };
