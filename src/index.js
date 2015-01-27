@@ -1,11 +1,11 @@
-(function (root, factory) {
+(function(root, factory) {
     "use strict";
 
-    if(typeof define === 'function' && define.amd){
-        define(['assign', 'jsonschema'], function(assign, jsonschema){
-          return (root.RecordsJS = factory(assign, jsonschema.Validator, localStorage));
+    if (typeof define === 'function' && define.amd) {
+        define(['assign', 'jsonschema'], function(assign, jsonschema) {
+            return (root.RecordsJS = factory(assign, jsonschema.Validator, localStorage));
         });
-    }else if(typeof module === 'object' && module.exports){
+    }else if (typeof module === 'object' && module.exports) {
         var assign = Object.assign || require('object.assign');
         var Validator = require('jsonschema').Validator;
         var storage;
@@ -13,15 +13,15 @@
         if (typeof localStorage === 'undefined' || localStorage === null) {
             var LocalStorage = require('node-localstorage').LocalStorage;
             storage = new LocalStorage('./localstorage.db');
-        }else{
+        }else {
             storage = localStorage;
         }
 
         module.exports = (root.RecordsJS = factory(assign, Validator, storage));
-    }else{
+    }else {
         root.RecordsJS = factory(Object.assign, root.Validator, localStorage);
     }
-}(this, function(assign, Validator, localStorage){
+}(this, function(assign, Validator, localStorage) { // jscs:disable validateIndentation
 "use strict";
 
 var defaults = {
@@ -34,7 +34,7 @@ var defaults = {
  * @param name the name of the storage
  * @param options optional parameter overriding the defaults
  */
-var RecordsJS = function (name, options){
+var RecordsJS = function(name, options) {
     var data;
 
     this.options = assign(defaults, options);
@@ -42,7 +42,7 @@ var RecordsJS = function (name, options){
     this.dataStore = this.options.dataPrefix + this.name + this.options.nameSeparator;
 
     data = this.deserialize(this.dataStore);
-    if(data === null){
+    if (data === null) {
         this.serialize(this.dataStore, {
             validation: {},
             schemas: {}
@@ -61,14 +61,14 @@ var RecordsJS = function (name, options){
  * @param data the object to store
  * @returns boolean if the operation succeded
  */
-RecordsJS.prototype.serialize = function(id, data){
+RecordsJS.prototype.serialize = function(id, data) {
     var dataStr;
 
-    try{
+    try {
         dataStr = JSON.stringify(data);
         localStorage.setItem(id, dataStr);
         return true;
-    }catch(ex){
+    }catch (ex) {
         console.error(ex);
         return false;
     }
@@ -79,20 +79,21 @@ RecordsJS.prototype.serialize = function(id, data){
  * @param id of the object
  * @returns the object stored or null id is not found
  */
-RecordsJS.prototype.deserialize = function(id){
-    var data, dataStr;
+RecordsJS.prototype.deserialize = function(id) {
+    var data;
+    var dataStr;
 
     dataStr = localStorage.getItem(id);
 
-    if(dataStr !== null){
-        try{
+    if (dataStr !== null) {
+        try {
             data = JSON.parse(dataStr);
             return data;
-        }catch(ex){
+        }catch (ex) {
             console.error(ex);
             return null;
         }
-    }else{
+    }else {
         return null;
     }
 };
@@ -101,19 +102,18 @@ RecordsJS.prototype.deserialize = function(id){
  * Delete an item from the storage
  * @param id of the object
  */
-RecordsJS.prototype.deleteFromStorage = function(id){
+RecordsJS.prototype.deleteFromStorage = function(id) {
     localStorage.removeItem(id);
 };
 
 /* Index methods */
-
 
 /**
  * Builds tne internal id for given id
  * @param id
  * @returns the internal id
  */
-RecordsJS.prototype.buildInternalId = function(id){
+RecordsJS.prototype.buildInternalId = function(id) {
     return this.dataStore + id;
 };
 
@@ -122,7 +122,7 @@ RecordsJS.prototype.buildInternalId = function(id){
  * @param key
  * @param internalKey
  */
-RecordsJS.prototype.addToIndex = function(key, internalKey){
+RecordsJS.prototype.addToIndex = function(key, internalKey) {
     this.index[key] = internalKey;
 };
 
@@ -130,24 +130,26 @@ RecordsJS.prototype.addToIndex = function(key, internalKey){
  * Maps keys with internal keys in the index
  * @param key
  */
-RecordsJS.prototype.deleteFromIndex = function(key){
+RecordsJS.prototype.deleteFromIndex = function(key) {
     delete this.index[key];
 };
 
 /**
  * Builds an index searching all the objects in the datastore namespace
  */
-RecordsJS.prototype.buildIndex = function(){
-    var regex, key, matches;
+RecordsJS.prototype.buildIndex = function() {
+    var regex;
+    var key;
+    var matches;
 
     regex = new RegExp('^' + this.dataStore + '(.+)$');
 
     this.index = {};
-    for(var i=0, len=localStorage.length; i<len; i++){
+    for (var i = 0, len = localStorage.length; i < len; i++) {
         key = localStorage.key(i);
 
         matches = key.match(regex);
-        if(matches !== null){
+        if (matches !== null) {
             this.addToIndex(matches[1], key);
         }
     }
@@ -160,7 +162,7 @@ RecordsJS.prototype.buildIndex = function(){
  * @param uri
  * @param schema
  */
-RecordsJS.prototype._addSchema = function(uri, schema){
+RecordsJS.prototype._addSchema = function(uri, schema) {
     this.schemas[uri] = new Validator();
     this.schemas[uri].addSchema(schema);
 };
@@ -170,14 +172,14 @@ RecordsJS.prototype._addSchema = function(uri, schema){
  * @param uri
  * @param dependency
  */
-RecordsJS.prototype._addSchemaDependency = function(uri, dependency){
+RecordsJS.prototype._addSchemaDependency = function(uri, dependency) {
     this.schemas[uri].addSchema(dependency);
 };
 
 /**
  * Load the existing schemas in the datastore into the validator
  */
-RecordsJS.prototype.loadSchemas = function(){
+RecordsJS.prototype.loadSchemas = function() {
     var dependency;
     var internals;
     var schemas;
@@ -188,13 +190,13 @@ RecordsJS.prototype.loadSchemas = function(){
     internals = this.deserialize(this.dataStore);
     schemas = internals.schemas;
 
-    if(schemas !== null){
-        for(var uri in schemas){
-            if(schemas.hasOwnProperty(key)){
+    if (schemas !== null) {
+        for (var uri in schemas) {
+            if (schemas.hasOwnProperty(key)) {
                 schema = schemas[uri];
                 this._addSchema(uri, schema.schema);
 
-                for(var key in schema.dependencies){
+                for (var key in schema.dependencies) {
                     dependency = schema.dependencies[key];
                     this._addSchemaDependency(uri, dependency);
                 }
@@ -203,12 +205,11 @@ RecordsJS.prototype.loadSchemas = function(){
     }
 };
 
-
 /**
  * Creates a new schema
  * @param schema a json schema identified for schema.id
  */
-RecordsJS.prototype.createSchema = function(schema){
+RecordsJS.prototype.createSchema = function(schema) {
     var internals;
     var schemaObj = {
         schema: schema,
@@ -229,7 +230,7 @@ RecordsJS.prototype.createSchema = function(schema){
  * @param uri the id of the existing schema
  * @param schema a json schema identified for schema.id
  */
-RecordsJS.prototype.addSchemaDependency = function(uri, schema){
+RecordsJS.prototype.addSchemaDependency = function(uri, schema) {
     var internals;
 
     internals = this.deserialize(this.dataStore);
@@ -243,7 +244,7 @@ RecordsJS.prototype.addSchemaDependency = function(uri, schema){
  * Delete a schema and its dependencies
  * @param uri the schema id
  */
-RecordsJS.prototype.deleteSchema = function(uri){
+RecordsJS.prototype.deleteSchema = function(uri) {
     var internals;
 
     internals = this.deserialize(this.dataStore);
@@ -258,7 +259,7 @@ RecordsJS.prototype.deleteSchema = function(uri){
  * @param uri the id of the schema
  * @returns the schema or undefined if not found
  */
-RecordsJS.prototype.getSchema = function(uri){
+RecordsJS.prototype.getSchema = function(uri) {
     var internals;
     var internalSchema;
     var schema;
@@ -266,7 +267,7 @@ RecordsJS.prototype.getSchema = function(uri){
     internals = this.deserialize(this.dataStore);
 
     internalSchema = internals.schemas[uri];
-    if(internalSchema !== undefined){
+    if (internalSchema !== undefined) {
         schema = internalSchema.schema;
     }
 
@@ -279,7 +280,7 @@ RecordsJS.prototype.getSchema = function(uri){
  * @param object an object to validate
  * @returns true/false if the object is valid
  */
-RecordsJS.prototype.validateSchema = function(uri, object){
+RecordsJS.prototype.validateSchema = function(uri, object) {
     var schema;
     var valid;
 
@@ -299,24 +300,27 @@ RecordsJS.prototype.validateSchema = function(uri, object){
  * @param options.metadata true/false if the object is wrapped in its metadata
  * @returns a boolean with the result of the operation
  */
-RecordsJS.prototype.put = function(id, object, options){
-    var annotation, internalId, result;
+RecordsJS.prototype.put = function(id, object, options) {
+    var annotation;
+    var internalId;
+    var result;
 
     options = assign({}, options);
     internalId = this.buildInternalId(id);
 
-    if(options.metadata !== true){
+    if (options.metadata !== true) {
         annotation = {};
         annotation._id = id;
         annotation.record = object;
-    }else{
+    }
+    else {
         annotation = object;
         annotation._id = id;
     }
 
     result = this.serialize(internalId, annotation);
 
-    if(result === true){
+    if (result === true) {
         this.addToIndex(id, internalId);
     }
 
@@ -329,11 +333,12 @@ RecordsJS.prototype.put = function(id, object, options){
  * @param options.metadata true/false if the object is wrapped in its metadata
  * @returns an array of booleans if the operation was completed
  */
-RecordsJS.prototype.putAll = function(objects, options){
-    var result, results;
+RecordsJS.prototype.putAll = function(objects, options) {
+    var result;
+    var results;
 
     results = [];
-    for(var i=0, len = objects.length; i<len; i++){
+    for (var i = 0, len = objects.length; i < len; i++) {
         result = this.put(objects[i].key, objects[i].value, options);
         results.push(result);
     }
@@ -346,17 +351,19 @@ RecordsJS.prototype.putAll = function(objects, options){
  * @param options.metadata true/false if the object should be returned in its metadata
  * @returns an object or null if doesn't exist
  */
-RecordsJS.prototype.get = function(id, options){
-    var annotation, internalId;
+RecordsJS.prototype.get = function(id, options) {
+    var annotation;
+    var internalId;
 
     options = assign({}, options);
     internalId = this.buildInternalId(id);
 
     annotation = this.deserialize(internalId);
 
-    if(options.metadata === true || annotation === null){
+    if (options.metadata === true || annotation === null) {
         return annotation;
-    }else{
+    }
+    else {
         return annotation.record;
     }
 };
@@ -366,18 +373,23 @@ RecordsJS.prototype.get = function(id, options){
  * @param options.metadata true/false if the object should be returned in its metadata
  * @returns an array of objects
  */
-RecordsJS.prototype.getAll = function(options){
-    var items, annotation, regex, matches, item;
+RecordsJS.prototype.getAll = function(options) {
+    var item;
+    var items;
+    var annotation;
+    var regex;
+    var matches;
 
     options = assign({}, options);
 
     items = [];
-    for(var key in this.index){
-        if(this.index.hasOwnProperty(key)){
+    for (var key in this.index) {
+        if (this.index.hasOwnProperty(key)) {
             annotation = this.deserialize(this.index[key]);
-            if(options.metadata === true){
+            if (options.metadata === true) {
                 item = annotation;
-            }else{
+            }
+            else {
                 item = annotation.record;
             }
 
@@ -392,7 +404,7 @@ RecordsJS.prototype.getAll = function(options){
  * Delete a stored object
  * @param id of the object
  */
-RecordsJS.prototype.delete = function(id){
+RecordsJS.prototype.delete = function(id) {
     var internalId;
 
     internalId = this.buildInternalId(id);
@@ -403,8 +415,8 @@ RecordsJS.prototype.delete = function(id){
 /**
  * Delete all stored object
  */
-RecordsJS.prototype.deleteAll = function(){
-    for(var key in this.index){
+RecordsJS.prototype.deleteAll = function() {
+    for (var key in this.index) {
         this.delete(key);
     }
 };
