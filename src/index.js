@@ -82,23 +82,20 @@ RecordsJS.prototype.serialize = function(id, data) {
  * @returns the object stored or null id is not found
  */
 RecordsJS.prototype.deserialize = function(id) {
-    var data;
     var dataStr;
+    var data = null;
 
     dataStr = localStorage.getItem(id);
 
     if (dataStr !== null) {
         try {
             data = JSON.parse(dataStr);
-            return data;
         }catch (ex) {
             console.error(ex);
-            return null;
         }
     }
-    else {
-        return null;
-    }
+
+    return data;
 };
 
 /**
