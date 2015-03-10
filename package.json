@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "private": true,
     "scripts": {
-        "test": "mocha --reporter xunit tests/test.js"
+        "test": "mocha --reporter xunit-file tests/test.js"
     },
     "dependencies": {
         "object.assign": "~1.1.1",
@@ -11,6 +11,7 @@
     },
     "devDependencies": {
         "mocha": "~2.1.0",
-        "node-localstorage" : "0.3.6"
+        "node-localstorage" : "0.3.6",
+        "xunit-file": "0.0.6"
     }
 }
