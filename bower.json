@@ -1,0 +1,23 @@
+{
+  "name": "fieldtrip-records",
+  "version": "0.0.0",
+  "homepage": "https://github.com/edina/records.js",
+  "authors": [
+    "Ruben Gamez <r.gamez@ed.ac.uk>"
+  ],
+  "description": "The record format for Fieltrip Open",
+  "main": "src/index.js",
+  "keywords": [
+    "fieldtrip",
+    "record",
+    "format"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
