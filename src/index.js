@@ -346,6 +346,25 @@ RecordsJS.prototype.putAll = function(objects, options) {
 };
 
 /**
+ * Put a geojson featureCollection into the storage
+ * @param geojson featureCollection
+ * @param options.metadata true/false if the object is wrapped in its metadata
+ * @returns an array of booleans if the operation was completed
+ */
+RecordsJS.prototype.putFeatureCollection = function(featureCollection, options) {
+    var result;
+    var results;
+    var collection = featureCollection.features;
+
+    results = [];
+    for (var i = 0, len = collection.length; i < len; i++) {
+        result = this.put(collection[i].name, collection[i], options);
+        results.push(result);
+    }
+    return results;
+};
+
+/**
  * Get a stored object
  * @param id the id of the object
  * @param options.metadata true/false if the object should be returned in its metadata

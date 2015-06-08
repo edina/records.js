@@ -4,7 +4,10 @@
   "scripts": {
     "lint": "node_modules/jshint/bin/jshint src/**.js",
     "test": "mocha --reporter xunit-file tests/test.js",
-    "release": "npm run lint && npm run test && node_modules/release-it/bin/release.js"
+    "uglify": "node_modules/uglify-js/bin/uglifyjs src/index.js -o dist/records.min.js",
+    "copy": "node_modules/shelljs/bin/shjs scripts/copy.js",
+    "release-it": "node_modules/release-it/bin/release.js",
+    "release": "npm run lint & npm run test & npm run copy & npm run uglify & npm run release-it"
   },
   "dependencies": {
     "object.assign": "~1.1.1",
@@ -15,6 +18,9 @@
     "mocha": "~2.1.0",
     "node-localstorage": "0.3.6",
     "release-it": "0.0.15",
-    "xunit-file": "0.0.6"
-  }
+    "xunit-file": "0.0.6",
+    "shelljs": "0.4.0",
+    "uglify-js": "latest"
+  },
+  "main": "dist/records.js"
 }
