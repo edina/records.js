@@ -2,6 +2,11 @@ var RecordsJS = require('../src/index.js');
 var assert = require('assert');
 var fs = require('fs');
 
+if (typeof localStorage === 'undefined' || localStorage === null) {
+    var LocalStorage = require('node-localstorage').LocalStorage;
+    localStorage = new LocalStorage('./localstorage.db');
+}
+
 describe('Records.JS', function() {
     var records = new RecordsJS('records');
     var testData = [

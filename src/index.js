@@ -3,27 +3,19 @@
 
     if (typeof define === 'function' && define.amd) {
         define(['assign', 'jsonschema'], function(assign, jsonschema) {
-            return (root.RecordsJS = factory(assign, jsonschema.Validator, localStorage));
+            return (root.RecordsJS = factory(assign, jsonschema.Validator));
         });
     }
     else if (typeof module === 'object' && module.exports) {
         var assign = Object.assign || require('object.assign');
         var Validator = require('jsonschema').Validator;
-        var storage;
 
-        if (typeof localStorage === 'undefined' || localStorage === null) {
-            var LocalStorage = require('node-localstorage').LocalStorage;
-            storage = new LocalStorage('./localstorage.db');
-        }else {
-            storage = localStorage;
-        }
-
-        module.exports = (root.RecordsJS = factory(assign, Validator, storage));
+        module.exports = (root.RecordsJS = factory(assign, Validator));
     }
     else {
-        root.RecordsJS = factory(Object.assign, root.Validator, localStorage);
+        root.RecordsJS = factory(Object.assign, root.Validator);
     }
-}(this, function(assign, Validator, localStorage) { // jscs:disable validateIndentation
+}(this, function(assign, Validator) { // jscs:disable validateIndentation
 "use strict";
 
 var defaults = {
