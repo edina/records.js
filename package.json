@@ -1,6 +1,6 @@
 {
   "name": "fieldtrip-records",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "lint": "node_modules/jshint/bin/jshint src/**.js",
     "test": "mocha --reporter xunit-file tests/test.js",
